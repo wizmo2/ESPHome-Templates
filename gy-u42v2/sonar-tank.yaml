@@ -1,0 +1,87 @@
+substitutions:
+  devicename: lamb-tank
+  friendly_name: Tank1
+  ip_address: !secret sonar_ip
+  ip_gateway: !secret gateway_ip
+  interval: 1h
+  
+esphome:
+  name: $devicename
+  includes:
+  - i2cmaxsonar2.h
+  - i2cmaxsonar2.cpp
+
+esp8266:
+  board: esp01_1m
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pwd
+  manual_ip:
+    static_ip: $ip_address
+    gateway: $ip_gateway
+    subnet: 255.255.255.0
+
+# Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "LambDisplay Fallback Hotspot"
+    password: "Dqd41c0k0oy2"
+
+captive_portal:
+
+# Enable logging
+logger: 
+  baud_rate: 0 # disable com port to free up io
+  
+i2c:
+  sda: 0
+  scl: 2
+  scan: true
+  
+# Enable Home Assistant API
+api:
+  password: !secret basic_pwd
+
+ota:
+  password: !secret basic_pwd
+  
+# web-server - uses a lot of resources 
+#web_server:
+#  port: 80
+  
+#deep_sleep:
+#  id: dpsleep
+#  run_duration: 15s # should provide atleast 2 good reads
+#  sleep_duration: $interval
+#  wakeup_pin: GPIO0  # esp32 only , esp8266 needs to be reset by (PIN16) XPD_DCDC
+#  wakeup_pin_mode: INVERT_WAKEUP # esp32 only
+
+button:
+  - platform: restart
+    name: $friendly_name Restart
+    
+binary_sensor:
+  - platform: status
+    name: $friendly_name Status
+
+sensor:
+  - platform: wifi_signal
+    name: $friendly_name WiFi Signal
+  - platform: uptime
+    name: $friendly_name Uptime
+
+  # custom sonar sensaor
+  - platform: custom
+    lambda: |-
+      auto my_sensor = new I2CMaxSonarSensor2(5000);
+      App.register_component(my_sensor);
+      return {my_sensor};
+    sensors:
+      name: $friendly_name Distance
+      id: distance
+      icon: mdi:arrow-expand-vert
+      state_class: measurement
+      unit_of_measurement: m
+      accuracy_decimals: 2
+
