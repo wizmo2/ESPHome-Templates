@@ -49,13 +49,12 @@ ota:
 # web-server - uses a lot of resources 
 #web_server:
 #  port: 80
-  
-#deep_sleep:
+ 
+ 
+#deep_sleep:  # on the ESP-01, needs needs to be reset by (PIN16) XPD_DCDC
 #  id: dpsleep
 #  run_duration: 15s # should provide atleast 2 good reads
 #  sleep_duration: $interval
-#  wakeup_pin: GPIO0  # esp32 only , esp8266 needs to be reset by (PIN16) XPD_DCDC
-#  wakeup_pin_mode: INVERT_WAKEUP # esp32 only
 
 button:
   - platform: restart
@@ -84,4 +83,3 @@ sensor:
       state_class: measurement
       unit_of_measurement: m
       accuracy_decimals: 2
-
